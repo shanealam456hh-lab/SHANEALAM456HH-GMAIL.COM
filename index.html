@@ -1,1 +1,82 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHANE ALAM - JAN SEVA KENDRA</title>
+<style>
+body{margin:0;font-family:Arial;background:#f1f8f3;color:#222}
+header{background:#087a42;color:white;text-align:center;padding:25px 10px}
+header h1{font-size:24px}
+nav{background:#075b34;padding:13px;text-align:center}
+nav a{color:white;margin:10px;text-decoration:none}
+.box{background:white;margin:15px;padding:20px;border-radius:12px;box-shadow:0 2px 8px #ccc}
+h2{color:#087a42}
+input,button{width:100%;padding:12px;margin:7px 0;box-sizing:border-box;border:1px solid #ccc;border-radius:7px}
+button{background:#087a42;color:white;border:0;font-size:16px}
+.service{padding:12px;border-bottom:1px solid #ddd}
+footer{background:#075b34;color:white;text-align:center;padding:20px}
+</style>
+</head>
+<body>
 
+<header>
+<h1>SHANE ALAM</h1>
+<h2 style="color:white">JAN SEVA KENDRA</h2>
+<p>आपकी सभी ऑनलाइन सेवाएँ एक ही जगह</p>
+</header>
+
+<nav>
+<a href="#home">होम</a>
+<a href="#login">लॉगिन</a>
+<a href="#services">सेवाएँ</a>
+<a href="#contact">संपर्क</a>
+</nav>
+
+<div class="box" id="home">
+<h2>जन सेवा केंद्र में आपका स्वागत है</h2>
+<p>यहाँ सभी प्रकार की ऑनलाइन सेवाओं के लिए संपर्क करें।</p>
+</div>
+
+<div class="box" id="login">
+<h2>Customer Registration / Login</h2>
+<input id="name" placeholder="अपना नाम लिखें">
+<input id="email" type="email" placeholder="ईमेल लिखें">
+<input id="password" type="password" placeholder="पासवर्ड लिखें">
+<button onclick="register()">Registration</button>
+<button onclick="login()">Login</button>
+<p id="message"></p>
+</div>
+
+<div class="box" id="services">
+<h2>हमारी ऑनलाइन सेवाएँ</h2>
+<div class="service">आधार कार्ड सेवा</div>
+<div class="service">पैन कार्ड सेवा</div>
+<div class="service">आय प्रमाण पत्र</div>
+<div class="service">निवास प्रमाण पत्र</div>
+<div class="service">आयुष्मान कार्ड</div>
+<div class="service">बिजली बिल भुगतान</div>
+</div>
+
+<div class="box" id="contact">
+<h2>संपर्क करें</h2>
+<p>SHANE ALAM JAN SEVA KENDRA</p>
+<p>ऑनलाइन आवेदन और सहायता के लिए संपर्क करें।</p>
+</div>
+
+<footer>
+<p>© SHANE ALAM JAN SEVA KENDRA</p>
+</footer>
+
+<script>
+function register(){
+document.getElementById("message").innerText=
+"Registration के लिए Firebase जोड़ना बाकी है।";
+}
+function login(){
+document.getElementById("message").innerText=
+"Login के लिए Firebase जोड़ना बाकी है।";
+}
+</script>
+</body>
+</html>
