@@ -1,21 +1,26 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHANE ALAM - JAN SEVA KENDRA</title>
+<title>SHANE ALAM JAN SEVA KENDRA</title>
 <style>
-body{margin:0;font-family:Arial;background:#f1f8f3;color:#222}
-header{background:#087a42;color:white;text-align:center;padding:25px 10px}
-header h1{font-size:24px}
-nav{background:#075b34;padding:13px;text-align:center}
-nav a{color:white;margin:10px;text-decoration:none}
-.box{background:white;margin:15px;padding:20px;border-radius:12px;box-shadow:0 2px 8px #ccc}
-h2{color:#087a42}
-input,button{width:100%;padding:12px;margin:7px 0;box-sizing:border-box;border:1px solid #ccc;border-radius:7px}
-button{background:#087a42;color:white;border:0;font-size:16px}
-.service{padding:12px;border-bottom:1px solid #ddd}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2f7f3;color:#183b29}
+header{background:#08713d;color:white;text-align:center;padding:28px 12px}
+header h1{margin:0;font-size:27px}
+nav{background:#075b34;padding:14px;text-align:center}
+nav a{color:white;text-decoration:none;margin:0 12px;font-weight:bold}
+.box{background:white;margin:18px auto;padding:20px;border-radius:12px;max-width:850px;box-shadow:0 2px 10px #0001}
+h2{color:#08713d}
+input{width:100%;padding:13px;margin:8px 0;border:1px solid #bbb;border-radius:7px;font-size:16px}
+button{background:#08713d;color:white;border:0;padding:12px 20px;border-radius:7px;font-size:15px;cursor:pointer;margin:5px}
+button:hover{background:#07532f}
+.service{background:#e7f5eb;padding:14px;margin:9px 0;border-radius:8px}
+.hidden{display:none}
 footer{background:#075b34;color:white;text-align:center;padding:20px}
+#message{color:#b3261e}
 </style>
 </head>
 <body>
@@ -28,7 +33,7 @@ footer{background:#075b34;color:white;text-align:center;padding:20px}
 
 <nav>
 <a href="#home">होम</a>
-<a href="#login">लॉगिन</a>
+<a href="#login">Admin Login</a>
 <a href="#services">सेवाएँ</a>
 <a href="#contact">संपर्क</a>
 </nav>
@@ -39,23 +44,26 @@ footer{background:#075b34;color:white;text-align:center;padding:20px}
 </div>
 
 <div class="box" id="login">
-<h2>Customer Registration / Login</h2>
-<input id="name" placeholder="अपना नाम लिखें">
-<input id="email" type="email" placeholder="ईमेल लिखें">
-<input id="password" type="password" placeholder="पासवर्ड लिखें">
-<button onclick="register()">Registration</button>
-<button onclick="login()">Login</button>
+<h2>Admin Login</h2>
+<p>केवल अधिकृत एडमिन लॉगिन करें।</p>
+<input id="email" type="email" placeholder="Admin Email">
+<input id="password" type="password" placeholder="Password">
+<button id="loginBtn">Admin Login</button>
+<button id="logoutBtn" class="hidden">Logout</button>
 <p id="message"></p>
+</div>
+
+<div class="box hidden" id="dashboard">
+<h2>Admin Dashboard</h2>
+<p>स्वागत है! आप नई सेवा जोड़ सकते हैं।</p>
+<input id="serviceName" placeholder="नई सेवा का नाम लिखें">
+<button id="addBtn">सेवा जोड़ें</button>
+<p id="adminMessage"></p>
 </div>
 
 <div class="box" id="services">
 <h2>हमारी ऑनलाइन सेवाएँ</h2>
-<div class="service">आधार कार्ड सेवा</div>
-<div class="service">पैन कार्ड सेवा</div>
-<div class="service">आय प्रमाण पत्र</div>
-<div class="service">निवास प्रमाण पत्र</div>
-<div class="service">आयुष्मान कार्ड</div>
-<div class="service">बिजली बिल भुगतान</div>
+<div id="serviceList">सेवाएँ लोड हो रही हैं...</div>
 </div>
 
 <div class="box" id="contact">
@@ -68,15 +76,166 @@ footer{background:#075b34;color:white;text-align:center;padding:20px}
 <p>© SHANE ALAM JAN SEVA KENDRA</p>
 </footer>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
-function register(){
-document.getElementById("message").innerText=
-"Registration के लिए Firebase जोड़ना बाकी है।";
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBBAUbR7JyImX8_k5S7TzwgEMvOL6pU6Yo",
+  authDomain: "shane-alam-janseva.firebaseapp.com",
+  projectId: "shane-alam-janseva",
+  storageBucket: "shane-alam-janseva.firebasestorage.app",
+  messagingSenderId: "737229938536",
+  appId: "1:737229938536:web:8208ec31f933d6fd5f80dd",
+  measurementId: "G-T7REH6SLTJ"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const servicesRef = db.collection("Services");
+
+// आपके Firebase Admin का UID
+const ADMIN_UID = "CivcacXNqKe0lb8Bkzve1kwUhdg2";
+
+const message = document.getElementById("message");
+const adminMessage = document.getElementById("adminMessage");
+
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function(c) {
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
 }
-function login(){
-document.getElementById("message").innerText=
-"Login के लिए Firebase जोड़ना बाकी है।";
-}
+
+// Admin Login
+document.getElementById("loginBtn").addEventListener("click", async function() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    message.textContent = "ईमेल और पासवर्ड भरें।";
+    return;
+  }
+
+  message.textContent = "Login हो रहा है...";
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch(error) {
+    message.textContent = "Login नहीं हुआ: " + error.message;
+  }
+});
+
+// Login की स्थिति
+auth.onAuthStateChanged(function(user) {
+  if (user && user.uid === ADMIN_UID) {
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("logoutBtn").classList.remove("hidden");
+    document.getElementById("loginBtn").classList.add("hidden");
+    message.textContent = "Admin Login सफल हुआ!";
+  } else {
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("logoutBtn").classList.add("hidden");
+    document.getElementById("loginBtn").classList.remove("hidden");
+
+    if (user) {
+      message.textContent = "यह अकाउंट Admin के लिए अधिकृत नहीं है।";
+      auth.signOut();
+    }
+  }
+});
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", function() {
+  auth.signOut();
+  document.getElementById("password").value = "";
+  message.textContent = "आप Logout हो गए हैं।";
+});
+
+// सेवाएँ दिखाना
+servicesRef.onSnapshot(function(snapshot) {
+  const list = document.getElementById("serviceList");
+  list.innerHTML = "";
+
+  if (snapshot.empty) {
+    list.textContent = "अभी कोई सेवा उपलब्ध नहीं है।";
+    return;
+  }
+
+  snapshot.forEach(function(doc) {
+    const data = doc.data();
+    const name = data.name || data.title || data.serviceName || data.service || doc.id;
+
+    const item = document.createElement("div");
+    item.className = "service";
+
+    const user = auth.currentUser;
+    const isAdmin = user && user.uid === ADMIN_UID;
+
+    item.innerHTML =
+      "<strong>" + safeText(name) + "</strong>" +
+      (isAdmin
+        ? ' <button data-delete="' + safeText(doc.id) + '">हटाएँ</button>'
+        : "");
+
+    list.appendChild(item);
+  });
+}, function(error) {
+  document.getElementById("serviceList").textContent =
+    "सेवाएँ लोड नहीं हुईं: " + error.message;
+});
+
+// नई सेवा जोड़ना
+document.getElementById("addBtn").addEventListener("click", async function() {
+  const user = auth.currentUser;
+  const name = document.getElementById("serviceName").value.trim();
+
+  if (!user || user.uid !== ADMIN_UID) {
+    adminMessage.textContent = "पहले Admin Login करें।";
+    return;
+  }
+
+  if (!name) {
+    adminMessage.textContent = "सेवा का नाम लिखें।";
+    return;
+  }
+
+  try {
+    await servicesRef.add({
+      name: name,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById("serviceName").value = "";
+    adminMessage.textContent = "नई सेवा सफलतापूर्वक जुड़ गई!";
+  } catch(error) {
+    adminMessage.textContent = "सेवा नहीं जुड़ी: " + error.message;
+  }
+});
+
+// सेवा हटाना
+document.getElementById("serviceList").addEventListener("click", async function(event) {
+  const button = event.target.closest("[data-delete]");
+  if (!button) return;
+
+  const user = auth.currentUser;
+  if (!user || user.uid !== ADMIN_UID) {
+    alert("Admin Login जरूरी है।");
+    return;
+  }
+
+  if (!confirm("क्या आप यह सेवा हटाना चाहते हैं?")) return;
+
+  try {
+    await servicesRef.doc(button.dataset.delete).delete();
+  } catch(error) {
+    alert("सेवा नहीं हटी: " + error.message);
+  }
+});
 </script>
 </body>
 </html>
